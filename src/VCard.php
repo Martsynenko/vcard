@@ -231,12 +231,16 @@ class VCard
 
         //Is this URL for a remote resource?
         if (filter_var($url, FILTER_VALIDATE_URL) !== false) {
-            $headers = get_headers($url, 1);
+            $finfo = new \finfo();
+            $mimeType = $finfo->buffer(file_get_contents($url), FILEINFO_MIME_TYPE);
+            if ($mimeType === false) {
+                $headers = get_headers($url, 1);
 
-            if (array_key_exists('Content-Type', $headers)) {
-                $mimeType = $headers['Content-Type'];
-                if (is_array($mimeType)) {
-                    $mimeType = end($mimeType);
+                if (array_key_exists('Content-Type', $headers)) {
+                    $mimeType = $headers['Content-Type'];
+                    if (is_array($mimeType)) {
+                        $mimeType = end($mimeType);
+                    }
                 }
             }
         } else {
